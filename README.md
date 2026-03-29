@@ -76,8 +76,8 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [X] Commit: `Implement receive_notification function in Notification service.`
     -   [X] Commit: `Implement receive function in Notification controller.`
     -   [X] Commit: `Implement list_messages function in Notification service.`
-    -   [ ] Commit: `Implement list function in Notification controller.`
-    -   [ ] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
+    -   [X] Commit: `Implement list function in Notification controller.`
+    -   [X] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
 
 ## Your Reflections
 This is the place for you to write reflections:
@@ -94,3 +94,14 @@ Rust memiliki aturan *ownership* dan *borrowing* yang sangat ketat untuk menjami
 Selain itu, Rust mewajibkan variabel `static` diinisialisasi dengan nilai konstan saat proses kompilasi (*compile-time*). Struktur data kompleks seperti `Vec` atau `DashMap` membutuhkan alokasi memori dinamis di *heap* yang baru bisa terjadi saat program berjalan (*runtime*). *Library* `lazy_static` digunakan sebagai solusi untuk menjembatani hal ini; ia menunda inisialisasi struktur data tersebut sampai variabelnya dipanggil pertama kali saat *runtime*, sekaligus membiarkan kita membungkusnya dengan *smart pointer* seperti `RwLock` agar mutasinya tetap terjamin aman.
 
 #### Reflection Subscriber-2
+
+**1. Have you explored things outside of the steps in the tutorial, for example: src/lib.rs? If not, explain why you did not do so. If yes, explain things that you have learned from those other parts of code.**
+Jujur, saya belum terlalu mengeksplorasi file di luar langkah-langkah wajib tutorial seperti `src/lib.rs`. Alasan utamanya adalah saya ingin fokus terlebih dahulu untuk menyelesaikan dan memahami alur utama dari *Observer Pattern* itu sendiri (membuat *Model*, *Repository*, *Service*, dan *Controller*). Langkah-langkah di dalam tutorial sudah cukup menantang dan butuh ketelitian agar tidak terjadi *error*. Saya khawatir jika terlalu jauh mengeksplorasi file konfigurasi atau *setup* *library* bawaan, fokus saya akan terpecah atau malah memicu kebingungan baru. Jadi, prioritas utama saya adalah memastikan fitur *subscribe*, *unsubscribe*, dan sinkronisasi antar-port berjalan sempurna terlebih dahulu.
+
+**2. Since you have completed the tutorial by now and have tried to test your notification system by spawning multiple instances of Receiver, explain how Observer pattern eases you to plug in more subscribers. How about spawning more than one instance of Main app, will it still be easy enough to add to the system?**
+*Observer Pattern* sangat memudahkan penambahan *subscribers* karena menerapkan *loose coupling*. *Publisher* tidak perlu tahu detail implementasi atau logika internal dari *Receiver*; ia hanya perlu tahu URL *endpoint* dari *Receiver* tersebut. Kita bisa menjalankan puluhan *instance Receiver* dan mereka tinggal mengirimkan *HTTP POST request* untuk mendaftar.
+Namun, menjalankan lebih dari satu *instance Main App* (*Publisher*) tidak akan semudah itu dengan arsitektur saat ini. Hal ini karena daftar *subscribers* disimpan di dalam memori lokal aplikasi (menggunakan `DashMap`). Jika ada dua *instance Publisher*, mereka akan memiliki memori `DashMap` yang berbeda dan tidak sinkron. Agar banyak *Publisher* bisa berjalan bersamaan dan tersinkronisasi, kita harus memindahkan penyimpanan data *subscribers* tersebut ke *database* eksternal seperti PostgreSQL atau Redis.
+
+**3. Have you tried to make your own Tests, or enhance documentation on your Postman collection? If you have tried those features, tell us whether it is useful for your work (it can be your tutorial work or your Group Project).**
+Jujur, saya belum mencoba membuat *Tests* sendiri atau menambahkan dokumentasi pada *Postman collection* di tutorial ini. Fokus utama saya saat ini adalah memastikan sistem notifikasi dan logika *Observer Pattern* berjalan dengan baik secara fungsional melalui pengetesan manual. 
+Namun, setelah mengetahui fungsinya, saya menyadari bahwa fitur seperti *Tests* akan sangat krusial untuk *Group Project* ke depannya. Dengan fitur tersebut, tim bisa mengotomatisasi pengecekan API sehingga jika ada anggota tim yang tidak sengaja merusak kode, *error*-nya bisa langsung terdeteksi tanpa harus dites manual satu per satu. Fitur dokumentasi juga pastinya akan sangat membantu mempermudah komunikasi bentuk *response* API antara *backend* dan *frontend developer*.
